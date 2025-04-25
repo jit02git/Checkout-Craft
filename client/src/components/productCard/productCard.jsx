@@ -1,12 +1,26 @@
-/* eslint-disable no-unused-vars */
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import myContext from "../../context/data/myContext";
-import productsData from '../utils/product.json';
-
+import axios from "axios";
 
 function ProductCard() {
   const context = useContext(myContext);
   const { mode } = context;
+
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/products"); 
+        setProducts(res.data);
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <section className="text-gray-600 body-font">
       <div className="container px-5 py-8 md:py-16 mx-auto">
@@ -21,8 +35,8 @@ function ProductCard() {
         </div>
 
         <div className="flex flex-wrap -m-4">
-          {productsData.products.map((item) => (
-            <div key={item.id} className="p-4 md:w-1/4 drop-shadow-lg">
+          {products.map((item) => (
+            <div key={item._id} className="p-4 md:w-1/4 drop-shadow-lg">
               <div
                 className="h-full border-2 hover:shadow-gray-100 hover:shadow-2xl transition-shadow duration-300 ease-in-out border-gray-200 border-opacity-60 rounded-2xl overflow-hidden"
                 style={{
