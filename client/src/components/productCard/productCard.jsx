@@ -5,21 +5,40 @@ import axios from "axios";
 function ProductCard() {
   const context = useContext(myContext);
   const { mode } = context;
-
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/products"); 
+        const res = await axios.get("http://localhost:5000/api/products");
         setProducts(res.data);
       } catch (err) {
         console.error("Failed to fetch products:", err);
       }
     };
-
     fetchProducts();
   }, []);
+
+  const handleAddToCart = async (productId) => {
+    try {
+      await axios.post(
+        "http://localhost:5000/api/cart",
+        {
+          productId,
+          quantity: 1, 
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      alert("Item added to cart!");
+    } catch (error) {
+      console.error("Failed to add item to cart:", error);
+      alert("Something went wrong while adding to cart.");
+    }
+  };
 
   return (
     <section className="text-gray-600 body-font">
@@ -74,6 +93,7 @@ function ProductCard() {
                     <button
                       type="button"
                       className="focus:outline-none text-white bg-pink-600 hover:bg-pink-700 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm w-full py-2"
+                      onClick={() => handleAddToCart(item._id)}
                     >
                       Add To Cart
                     </button>
